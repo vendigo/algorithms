@@ -51,20 +51,22 @@ public class WordNet {
 
     // returns all WordNet nouns
     public Iterable<String> nouns() {
-        return null;
+        return nounsToSyns.keySet();
     }
 
     // is the word a WordNet noun?
     public boolean isNoun(String word) {
         notNull(word);
-
-        return false;
+        return nounsToSyns.containsKey(word);
     }
 
     // distance between nounA and nounB (defined below)
     public int distance(String nounA, String nounB) {
         notNull(nounA);
         notNull(nounB);
+        assertTrue(isNoun(nounA));
+        assertTrue(isNoun(nounB));
+
 
         return 0;
     }
@@ -74,6 +76,8 @@ public class WordNet {
     public String sap(String nounA, String nounB) {
         notNull(nounA);
         notNull(nounB);
+        assertTrue(isNoun(nounA));
+        assertTrue(isNoun(nounB));
 
         return null;
     }
@@ -126,6 +130,12 @@ public class WordNet {
     private void notNull(Object arg) {
         if (arg == null) {
             throw new IllegalArgumentException("Arg should be not null");
+        }
+    }
+
+    private void assertTrue(boolean condition) {
+        if (!condition) {
+            throw new IllegalArgumentException("Condition is not met");
         }
     }
 }

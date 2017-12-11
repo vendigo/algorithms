@@ -1,0 +1,7 @@
+task pack {
+    doLast {
+        if (!$part || !task) {
+            throw new IllegalArgumentException('Parameters were not provided')
+        }
+    }
+}
