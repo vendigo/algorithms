@@ -3,15 +3,13 @@ package coursera.alg2.wordnet;
 import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 import edu.princeton.cs.algs4.Digraph;
 
-import static coursera.alg2.wordnet.Validator.notNull;
-
 public class SAP {
-    private Digraph graph;
+    private final Digraph graph;
 
     // constructor takes a digraph (not necessarily a DAG)
     public SAP(Digraph graph) {
         notNull(graph);
-        this.graph = graph;
+        this.graph = new Digraph(graph);
     }
 
     // length of shortest ancestral path between v and w; -1 if no such path
@@ -45,6 +43,8 @@ public class SAP {
     }
 
     private int multyVertices(Iterable<Integer> v, Iterable<Integer> w, boolean returnAnc) {
+        notNull(v);
+        notNull(w);
         v.forEach(this::validateV);
         w.forEach(this::validateV);
 
@@ -71,13 +71,19 @@ public class SAP {
         if (returnAnc) {
             return anc;
         } else {
-            return minLen;
+            return minLen == Integer.MAX_VALUE ? -1 : minLen;
         }
     }
 
     private void validateV(int v) {
         if (v < 0 || v > graph.V() - 1) {
             throw new IllegalArgumentException("v is out of range");
+        }
+    }
+
+    private void notNull(Object arg) {
+        if (arg == null) {
+            throw new IllegalArgumentException("Arg should be not null");
         }
     }
 }

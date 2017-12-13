@@ -5,11 +5,6 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Topological;
 
 import java.util.*;
-import java.util.stream.Stream;
-
-import static coursera.alg2.wordnet.Validator.assertTrue;
-import static coursera.alg2.wordnet.Validator.notNull;
-import static java.util.stream.Collectors.toSet;
 
 public class WordNet {
     private static final String COMA = ",";
@@ -18,7 +13,7 @@ public class WordNet {
     private Map<Integer, String> syns;
     private Map<Integer, Set<Integer>> hypernyms;
     private Digraph graph;
-    private SAP sap;
+    private final SAP sap;
 
     // constructor takes the name of the two input files
     public WordNet(String synsetsFile, String hypernymsFile) {
@@ -28,17 +23,17 @@ public class WordNet {
         readSynsets(synsetsFile);
         readHypernyms(hypernymsFile);
         createGraph();
-        isRootedDAG(graph);
+        isRootedDAG();
         this.sap = new SAP(graph);
     }
 
-    private void isRootedDAG(Digraph graph) {
+    private void isRootedDAG() {
         Topological topological = new Topological(graph);
         if (topological.hasOrder()) {
             if (graph.V() > 1) {
                 Iterator<Integer> iterator = topological.order().iterator();
                 iterator.next();
-                Integer second = iterator.next();
+                int second = iterator.next();
                 if (graph.outdegree(second) == 0) {
                     throw new IllegalArgumentException("DAG is not single rooted");
                 }
@@ -88,7 +83,7 @@ public class WordNet {
         while (in.hasNextLine()) {
             String[] elems = in.readLine().split(COMA);
             int synsetId = Integer.parseInt(elems[0]);
-            Set<String> nouns = Stream.of(elems[1].split(SPACE)).collect(toSet());
+            Set<String> nouns = collectToSet(elems[1]);
             syns.put(synsetId, elems[1]);
             for (String noun : nouns) {
                 if (!nounsToSyns.containsKey(noun)) {
@@ -102,6 +97,12 @@ public class WordNet {
         }
     }
 
+    private Set<String> collectToSet(String elem) {
+        Set<String> result = new HashSet<>();
+        result.addAll(Arrays.asList(elem.split(SPACE)));
+        return result;
+    }
+
     private void readHypernyms(String fileName) {
         hypernyms = new HashMap<>();
         In in = new In(fileName);
@@ -109,7 +110,14 @@ public class WordNet {
         while (in.hasNextLine()) {
             String[] parts = in.readLine().split(COMA);
             int synsetId = Integer.parseInt(parts[0]);
-            Set<Integer> links = new HashSet<>(parts.length - 1);
+
+            Set<Integer> links;
+            if (hypernyms.containsKey(synsetId)) {
+                links = hypernyms.get(synsetId);
+            } else {
+                links = new HashSet<>(parts.length - 1);
+            }
+
             for (int i = 1; i < parts.length; i++) {
                 links.add(Integer.parseInt(parts[i]));
             }
@@ -120,9 +128,21 @@ public class WordNet {
     private void createGraph() {
         graph = new Digraph(syns.size());
         hypernyms.forEach((id, hypers) -> {
-            for (Integer hyper : hypers) {
+            for (int hyper : hypers) {
                 graph.addEdge(id, hyper);
             }
         });
+    }
+
+    private void notNull(Object arg) {
+        if (arg == null) {
+            throw new IllegalArgumentException("Arg should be not null");
+        }
+    }
+
+    private void assertTrue(boolean condition) {
+        if (!condition) {
+            throw new IllegalArgumentException("Condition is not met");
+        }
     }
 }
