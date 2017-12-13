@@ -17,9 +17,23 @@ public class WordNetTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void notSingleRootedDAG() throws Exception {
+    public void notSingleRootedDAG1() throws Exception {
         String synsetsFile = p.file("synsets3.txt");
         String hyperFile = p.file("hypernyms3InvalidTwoRoots.txt");
+        new WordNet(synsetsFile, hyperFile);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void notSingleRootedDAG2() throws Exception {
+        String synsetsFile = p.file("synsets6.txt");
+        String hyperFile = p.file("hypernyms6InvalidTwoRoots.txt");
+        new WordNet(synsetsFile, hyperFile);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void notSingleRootedDAG3() throws Exception {
+        String synsetsFile = p.file("synsets6.txt");
+        String hyperFile = p.file("hypernyms6InvalidCycle+Path.txt");
         new WordNet(synsetsFile, hyperFile);
     }
 

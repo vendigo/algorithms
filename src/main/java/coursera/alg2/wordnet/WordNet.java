@@ -1,8 +1,8 @@
 package coursera.alg2.wordnet;
 
 import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.DirectedCycle;
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.Topological;
 
 import java.util.*;
 
@@ -11,7 +11,6 @@ public class WordNet {
     private static final String SPACE = " ";
     private Map<String, Set<Integer>> nounsToSyns;
     private Map<Integer, String> syns;
-    private Map<Integer, Set<Integer>> hypernyms;
     private Digraph graph;
     private final SAP sap;
 
@@ -22,24 +21,28 @@ public class WordNet {
 
         readSynsets(synsetsFile);
         readHypernyms(hypernymsFile);
-        createGraph();
         isRootedDAG();
         this.sap = new SAP(graph);
     }
 
     private void isRootedDAG() {
-        Topological topological = new Topological(graph);
-        if (topological.hasOrder()) {
+        DirectedCycle cycle = new DirectedCycle(graph);
+        if (!cycle.hasCycle()) {
             if (graph.V() > 1) {
-                Iterator<Integer> iterator = topological.order().iterator();
-                iterator.next();
-                int second = iterator.next();
-                if (graph.outdegree(second) == 0) {
-                    throw new IllegalArgumentException("DAG is not single rooted");
+                boolean foundFirstRoot = false;
+
+                for (int v = 0; v < graph.V(); v++) {
+                    if (graph.outdegree(v) == 0) {
+                        if (!foundFirstRoot) {
+                            foundFirstRoot = true;
+                        } else {
+                            throw new IllegalArgumentException("DAG is not single rooted");
+                        }
+                    }
                 }
             }
         } else {
-            throw new IllegalArgumentException("Not a DAG");
+            throw new IllegalArgumentException("Not a DAG - Has cycle");
         }
     }
 
@@ -104,34 +107,17 @@ public class WordNet {
     }
 
     private void readHypernyms(String fileName) {
-        hypernyms = new HashMap<>();
         In in = new In(fileName);
+        graph = new Digraph(syns.size());
 
         while (in.hasNextLine()) {
             String[] parts = in.readLine().split(COMA);
             int synsetId = Integer.parseInt(parts[0]);
 
-            Set<Integer> links;
-            if (hypernyms.containsKey(synsetId)) {
-                links = hypernyms.get(synsetId);
-            } else {
-                links = new HashSet<>(parts.length - 1);
-            }
-
             for (int i = 1; i < parts.length; i++) {
-                links.add(Integer.parseInt(parts[i]));
+                graph.addEdge(synsetId, Integer.parseInt(parts[i]));
             }
-            hypernyms.put(synsetId, links);
         }
-    }
-
-    private void createGraph() {
-        graph = new Digraph(syns.size());
-        hypernyms.forEach((id, hypers) -> {
-            for (int hyper : hypers) {
-                graph.addEdge(id, hyper);
-            }
-        });
     }
 
     private void notNull(Object arg) {
