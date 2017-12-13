@@ -7,15 +7,18 @@ import edu.princeton.cs.algs4.Topological;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static coursera.alg2.wordnet.Validator.assertTrue;
+import static coursera.alg2.wordnet.Validator.notNull;
 import static java.util.stream.Collectors.toSet;
 
 public class WordNet {
     private static final String COMA = ",";
     private static final String SPACE = " ";
     private Map<String, Set<Integer>> nounsToSyns;
-    private Map<Integer, Set<String>> synsToNouns;
+    private Map<Integer, String> syns;
     private Map<Integer, Set<Integer>> hypernyms;
     private Digraph graph;
+    private SAP sap;
 
     // constructor takes the name of the two input files
     public WordNet(String synsetsFile, String hypernymsFile) {
@@ -26,6 +29,7 @@ public class WordNet {
         readHypernyms(hypernymsFile);
         createGraph();
         isRootedDAG(graph);
+        this.sap = new SAP(graph);
     }
 
     private void isRootedDAG(Digraph graph) {
@@ -42,11 +46,6 @@ public class WordNet {
         } else {
             throw new IllegalArgumentException("Not a DAG");
         }
-    }
-
-    public static void main(String[] args) {
-        WordNet wordNet = new WordNet("D:\\learning\\Coursera\\alg2\\wordnet\\wordnet-testing\\synsets8.txt",
-                "D:\\learning\\Coursera\\alg2\\wordnet\\wordnet-testing\\hypernyms8ManyAncestors.txt");
     }
 
     // returns all WordNet nouns
@@ -67,8 +66,7 @@ public class WordNet {
         assertTrue(isNoun(nounA));
         assertTrue(isNoun(nounB));
 
-
-        return 0;
+        return sap.length(nounsToSyns.get(nounA), nounsToSyns.get(nounB));
     }
 
     // a synset (second field of nounsToSyns.txt) that is the common ancestor of nounA and nounB
@@ -79,18 +77,19 @@ public class WordNet {
         assertTrue(isNoun(nounA));
         assertTrue(isNoun(nounB));
 
-        return null;
+        int synsetId = sap.ancestor(nounsToSyns.get(nounA), nounsToSyns.get(nounB));
+        return syns.get(synsetId);
     }
 
     private void readSynsets(String fileName) {
         nounsToSyns = new HashMap<>();
-        synsToNouns = new HashMap<>();
+        syns = new HashMap<>();
         In in = new In(fileName);
         while (in.hasNextLine()) {
             String[] elems = in.readLine().split(COMA);
             int synsetId = Integer.parseInt(elems[0]);
             Set<String> nouns = Stream.of(elems[1].split(SPACE)).collect(toSet());
-            synsToNouns.put(synsetId, nouns);
+            syns.put(synsetId, elems[1]);
             for (String noun : nouns) {
                 if (!nounsToSyns.containsKey(noun)) {
                     Set<Integer> ids = new HashSet<>();
@@ -119,23 +118,11 @@ public class WordNet {
     }
 
     private void createGraph() {
-        graph = new Digraph(synsToNouns.size());
+        graph = new Digraph(syns.size());
         hypernyms.forEach((id, hypers) -> {
             for (Integer hyper : hypers) {
                 graph.addEdge(id, hyper);
             }
         });
-    }
-
-    private void notNull(Object arg) {
-        if (arg == null) {
-            throw new IllegalArgumentException("Arg should be not null");
-        }
-    }
-
-    private void assertTrue(boolean condition) {
-        if (!condition) {
-            throw new IllegalArgumentException("Condition is not met");
-        }
     }
 }
