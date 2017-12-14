@@ -17,7 +17,7 @@ public class SeamCarver {
     }
 
     public Picture picture() {
-        return picture;
+        return new Picture(picture);
     }
 
 
@@ -43,6 +43,7 @@ public class SeamCarver {
     }
 
     private int[] findSeam(int h, int w, boolean revert) {
+        calculateEnergy();
         double[][] distTo = new double[h][w];
 
         for (int i = 0; i < w; i++) { // Init top row
@@ -82,7 +83,7 @@ public class SeamCarver {
         Picture newPicture = new Picture(width, height - 1);
         for (int col = 0; col < width; col++) {
             for (int row = 0; row < height - 1; row++) {
-                if (row < seam[row]) {
+                if (row < seam[col]) {
                     newPicture.set(col, row, picture.get(col, row));
                 } else {
                     newPicture.set(col, row, picture.get(col, row + 1));
