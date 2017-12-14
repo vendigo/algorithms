@@ -114,4 +114,15 @@ public class SCUtility {
         }
     }
 
+    public static void printMatrix(double[][] m, int width, int height) {
+        DecimalFormat f = new DecimalFormat("#.##");
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                System.out.print(f.format(m[y][x]) + " ");
+            }
+            System.out.println();
+        }
+    }
+
 }

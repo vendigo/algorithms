@@ -5,6 +5,7 @@ import edu.princeton.cs.algs4.Picture;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 
 public class SeamCarverTest {
@@ -21,6 +22,13 @@ public class SeamCarverTest {
         assertThat(seamCarver.energy(2, 2), closeTo(94.36, 0.1));
         assertThat(seamCarver.energy(2, 3), closeTo(312.36, 0.1));
         assertThat(seamCarver.energy(4, 5), closeTo(1000, 0.1));
+    }
+
+    @Test
+    public void verticalSeam() throws Exception {
+        Picture picture = new Picture(p.file("5x6.png"));
+        SeamCarver seamCarver = new SeamCarver(picture);
+        assertThat(seamCarver.findVerticalSeam(), equalTo(new int[]{1, 2, 2, 3, 2, 1}));
     }
 
     @Test(expected = IllegalArgumentException.class)

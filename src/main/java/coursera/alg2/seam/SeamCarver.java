@@ -39,7 +39,35 @@ public class SeamCarver {
     }
 
     public int[] findVerticalSeam() {
-        return null;
+        double[][] distTo = new double[height][width];
+
+        for (int i = 0; i < width; i++) { // Init top row
+            distTo[0][i] = 1000;
+        }
+
+        for (int y = 1; y < height; y++) { //Fill distTo
+            for (int x = 0; x < width; x++) {
+                distTo[y][x] = distTo[y - 1][minTop3Index(distTo[y - 1], x)] + energy[y][x];
+            }
+        }
+
+        int minIndex = 0;
+        for (int i = 0; i < width; i++) { //Find first element of the seam - min value in the last row
+            if (distTo[height - 1][i] < distTo[height - 1][minIndex]) {
+                minIndex = i;
+            }
+        }
+
+        int[] seam = new int[height];
+        seam[height - 1] = minIndex;
+        int prevX = minIndex;
+
+        for (int y = height - 2; y >= 0; y--) { //Build seam
+            prevX = minTop3Index(distTo[y], prevX);
+            seam[y] = prevX;
+        }
+
+        return seam;
     }
 
     public void removeHorizontalSeam(int[] seam) {
@@ -48,6 +76,26 @@ public class SeamCarver {
 
     public void removeVerticalSeam(int[] seam) {
         validateSeam(seam, height, width);
+    }
+
+    private int minTop3Index(double[] arr, int x) {
+        if (width == 1) {
+            return x;
+        }
+
+        if (x == 0) {
+            return minArrIndex(arr, x, x + 1);
+        }
+
+        if (x == width - 1) {
+            return minArrIndex(arr, x - 1, x);
+        }
+
+        return minArrIndex(arr, minArrIndex(arr, x - 1, x), x + 1);
+    }
+
+    private int minArrIndex(double[] arr, int i, int j) {
+        return arr[i] <= arr[j] ? i : j;
     }
 
     private void calculateEnergy() {
