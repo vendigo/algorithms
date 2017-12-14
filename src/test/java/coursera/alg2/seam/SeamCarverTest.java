@@ -31,6 +31,14 @@ public class SeamCarverTest {
         assertThat(seamCarver.findVerticalSeam(), equalTo(new int[]{1, 2, 2, 3, 2, 1}));
     }
 
+    @Test
+    public void horizontalSeam() throws Exception {
+        Picture picture = new Picture(p.file("5x6.png"));
+        SeamCarver seamCarver = new SeamCarver(picture);
+        assertThat(seamCarver.findHorizontalSeam(), equalTo(new int[]{2, 3, 2, 3, 2}));
+    }
+
+
     @Test(expected = IllegalArgumentException.class)
     public void seamInvalidLen() throws Exception {
         Picture picture = new Picture(p.file("5x6.png"));

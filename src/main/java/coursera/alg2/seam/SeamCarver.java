@@ -35,35 +35,45 @@ public class SeamCarver {
     }
 
     public int[] findHorizontalSeam() {
-        return null;
+        return findSeam(width, height, true);
     }
 
     public int[] findVerticalSeam() {
-        double[][] distTo = new double[height][width];
+        return findSeam(height, width, false);
+    }
 
-        for (int i = 0; i < width; i++) { // Init top row
+    private int[] findSeam(int h, int w, boolean revert) {
+        double[][] distTo = new double[h][w];
+
+        for (int i = 0; i < w; i++) { // Init top row
             distTo[0][i] = 1000;
         }
 
-        for (int y = 1; y < height; y++) { //Fill distTo
-            for (int x = 0; x < width; x++) {
-                distTo[y][x] = distTo[y - 1][minTop3Index(distTo[y - 1], x)] + energy[y][x];
+        for (int y = 1; y < h; y++) { //Fill distTo
+            for (int x = 0; x < w; x++) {
+                double add;
+                if (revert) {
+                    add = energy[x][y];
+                } else {
+                    add = energy[y][x];
+                }
+                distTo[y][x] = distTo[y - 1][minTop3Index(distTo[y - 1], w, x)] + add;
             }
         }
 
         int minIndex = 0;
-        for (int i = 0; i < width; i++) { //Find first element of the seam - min value in the last row
-            if (distTo[height - 1][i] < distTo[height - 1][minIndex]) {
+        for (int i = 0; i < w; i++) { //Find first element of the seam - min value in the last row
+            if (distTo[h - 1][i] < distTo[h - 1][minIndex]) {
                 minIndex = i;
             }
         }
 
-        int[] seam = new int[height];
-        seam[height - 1] = minIndex;
+        int[] seam = new int[h];
+        seam[h - 1] = minIndex;
         int prevX = minIndex;
 
-        for (int y = height - 2; y >= 0; y--) { //Build seam
-            prevX = minTop3Index(distTo[y], prevX);
+        for (int y = h - 2; y >= 0; y--) { //Build seam
+            prevX = minTop3Index(distTo[y], w, prevX);
             seam[y] = prevX;
         }
 
@@ -71,15 +81,19 @@ public class SeamCarver {
     }
 
     public void removeHorizontalSeam(int[] seam) {
+        moreThan1(height);
         validateSeam(seam, width, height);
+
     }
 
     public void removeVerticalSeam(int[] seam) {
+        moreThan1(width);
         validateSeam(seam, height, width);
     }
 
-    private int minTop3Index(double[] arr, int x) {
-        if (width == 1) {
+
+    private int minTop3Index(double[] arr, int w, int x) {
+        if (w == 1) {
             return x;
         }
 
@@ -87,7 +101,7 @@ public class SeamCarver {
             return minArrIndex(arr, x, x + 1);
         }
 
-        if (x == width - 1) {
+        if (x == w - 1) {
             return minArrIndex(arr, x - 1, x);
         }
 
@@ -132,6 +146,12 @@ public class SeamCarver {
 
     private boolean isMarginal(int x, int y) {
         return x == 0 || x == width - 1 || y == 0 || y == height - 1;
+    }
+
+    private void moreThan1(int n) {
+        if (n <= 1) {
+            throw new IllegalArgumentException("Size should be > 1");
+        }
     }
 
     private void notNull(Object o) {
