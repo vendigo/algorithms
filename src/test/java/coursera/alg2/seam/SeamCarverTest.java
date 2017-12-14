@@ -61,10 +61,21 @@ public class SeamCarverTest {
     }
 
     @Test
-    public void drawEnergy() throws Exception {
+    public void applySeam() throws Exception {
         Picture picture = new Picture(p.file("chameleon.png"));
         SeamCarver seamCarver = new SeamCarver(picture);
-        //SCUtility.toEnergyPicture(seamCarver).show();
+
+
+        for (int i = 0; i < 60; i++) {
+            seamCarver.removeHorizontalSeam(seamCarver.findHorizontalSeam());
+        }
+
+        for (int i = 0; i < 40; i++) {
+            seamCarver.removeVerticalSeam(seamCarver.findVerticalSeam());
+        }
+
+        //picture.show();
+        //seamCarver.picture().show();
         //TimeUnit.MINUTES.sleep(2);
     }
 }

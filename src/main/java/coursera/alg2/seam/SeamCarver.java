@@ -51,12 +51,7 @@ public class SeamCarver {
 
         for (int y = 1; y < h; y++) { //Fill distTo
             for (int x = 0; x < w; x++) {
-                double add;
-                if (revert) {
-                    add = energy[x][y];
-                } else {
-                    add = energy[y][x];
-                }
+                double add = revert ? energy[x][y] : energy[y][x];
                 distTo[y][x] = distTo[y - 1][minTop3Index(distTo[y - 1], w, x)] + add;
             }
         }
@@ -84,11 +79,36 @@ public class SeamCarver {
         moreThan1(height);
         validateSeam(seam, width, height);
 
+        Picture newPicture = new Picture(width, height - 1);
+        for (int col = 0; col < width; col++) {
+            for (int row = 0; row < height - 1; row++) {
+                if (row < seam[row]) {
+                    newPicture.set(col, row, picture.get(col, row));
+                } else {
+                    newPicture.set(col, row, picture.get(col, row + 1));
+                }
+            }
+        }
+        picture = newPicture;
+        height--;
     }
 
     public void removeVerticalSeam(int[] seam) {
         moreThan1(width);
         validateSeam(seam, height, width);
+
+        Picture newPicture = new Picture(width - 1, height);
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width - 1; col++) {
+                if (col < seam[row]) {
+                    newPicture.set(col, row, picture.get(col, row));
+                } else {
+                    newPicture.set(col, row, picture.get(col + 1, row));
+                }
+            }
+        }
+        picture = newPicture;
+        width--;
     }
 
 
@@ -177,6 +197,7 @@ public class SeamCarver {
             if (v < 0 || v >= bound || Math.abs(v - prev) > 1) {
                 throw new IllegalArgumentException("Invalid seam");
             }
+            prev = v;
         }
     }
 }
