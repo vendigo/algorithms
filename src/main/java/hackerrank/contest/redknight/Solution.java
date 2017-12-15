@@ -50,11 +50,52 @@ public class Solution {
 
         if (distTo.containsKey(end)) {
             System.out.println(distTo.get(end));
+            System.out.println(buildPath(paths));
         } else {
             System.out.println("Impossible");
         }
     }
 
+    public String buildPath(Map<Point, Point> paths) {
+        Point c = end;
+        List<String> commands = new ArrayList<>();
+        while (c != start) {
+            Point next = paths.get(c);
+            commands.add(getCommand(next, c)); //As we constructing from end to start
+            c = next;
+        }
+        Collections.reverse(commands);
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < commands.size() - 1; i++) {
+            result.append(commands.get(i)).append(" ");
+        }
+        result.append(commands.get(commands.size() - 1));
+        return result.toString();
+    }
+
+    public String getCommand(Point v, Point w) {
+        if (v.y > w.y) {
+            if (v.x > w.x) {
+                return "UL";
+            } else {
+                return "UR";
+            }
+        }
+
+        if (v.y == w.y) {
+            if (v.x > w.x) {
+                return "L";
+            } else {
+                return "R";
+            }
+        }
+
+        if (v.x > w.x) {
+            return "LL";
+        }
+
+        return "LR";
+    }
 
     public List<Point> adj(Point p) {
         List<Point> points = new ArrayList<>(6);
