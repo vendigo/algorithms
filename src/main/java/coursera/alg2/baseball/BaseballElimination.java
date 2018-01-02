@@ -7,7 +7,6 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -95,15 +94,16 @@ public class BaseballElimination {
 
         stat.eliminated = checkElimination(flowNetwork);
         if (stat.eliminated) { //Provide certificate
-            stat.certificate = buildCertificate(stat, ff);
+            stat.certificate = buildCertificate(stat, verticesMap, ff);
         }
     }
 
-    private Iterable<String> buildCertificate(Stats stat, FordFulkerson ff) {
+    private Iterable<String> buildCertificate(Stats stat, Map<String, Integer> verticesMap, FordFulkerson ff) {
         Set<String> certificate = new HashSet<>();
         for (Stats cStat : statsByName.values()) {
             if (cStat.id != stat.id) {
-                if (ff.inCut(cStat.id)) {
+                int vertexId = verticesMap.get(String.valueOf(cStat.id));
+                if (ff.inCut(vertexId)) {
                     certificate.add(cStat.name);
                 }
             }
@@ -186,7 +186,9 @@ public class BaseballElimination {
     private boolean trivialElimination(Stats stat, Stats maxStat) {
         if (stat.wins + stat.remaining < maxStat.wins) {
             stat.eliminated = true;
-            stat.certificate = Collections.singletonList(maxStat.name);
+            HashSet<String> certificate = new HashSet<>();
+            certificate.add(maxStat.name);
+            stat.certificate = certificate;
             return true;
         }
 
