@@ -1,6 +1,10 @@
 package hackerrank.algo.search;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 public class IceCreamParlor {
     public static void main(String[] args) {
@@ -43,7 +47,7 @@ public class IceCreamParlor {
             }
         }
 
-        throw new RuntimeException("Solution was not found");
+        throw new RuntimeException("BreakingSticks was not found");
     }
 
     private static String formatSolution(int firstIndex, int secondIndex) {

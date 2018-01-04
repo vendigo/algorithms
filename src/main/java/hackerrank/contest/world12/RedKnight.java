@@ -1,8 +1,18 @@
-package hackerrank.contest.redknight;
+package hackerrank.contest.world12;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.Set;
 
-public class Solution {
+public class RedKnight {
     private int n;
     private Point start;
     private Point end;
@@ -15,10 +25,10 @@ public class Solution {
         int yEnd = scanner.nextInt();
         int xEnd = scanner.nextInt();
 
-        new Solution(n, xStart, yStart, xEnd, yEnd).solve();
+        new RedKnight(n, xStart, yStart, xEnd, yEnd).solve();
     }
 
-    Solution(int n, int xStart, int yStart, int xEnd, int yEnd) {
+    RedKnight(int n, int xStart, int yStart, int xEnd, int yEnd) {
         this.n = n;
         this.start = new Point(xStart, yStart);
         this.end = new Point(xEnd, yEnd);
