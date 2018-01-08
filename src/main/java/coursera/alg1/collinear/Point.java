@@ -30,7 +30,7 @@ public class Point implements Comparable<Point> {
             }
         }
 
-        return (y - that.y)/(x - that.x);
+        return ((double)(y - that.y))/(x - that.x);
     }
 
     public int compareTo(Point that) {
