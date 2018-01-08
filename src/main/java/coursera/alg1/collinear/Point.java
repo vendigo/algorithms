@@ -30,6 +30,10 @@ public class Point implements Comparable<Point> {
             }
         }
 
+        if (y == that.y) {
+            return 0;
+        }
+
         return ((double)(y - that.y))/(x - that.x);
     }
 

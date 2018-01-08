@@ -2,9 +2,7 @@ package coursera.alg1.collinear;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class BruteCollinearPoints {
     private List<LineSegment> lineSegments = new ArrayList<>();
@@ -42,6 +40,7 @@ public class BruteCollinearPoints {
     }
 
     static LineSegment lineSegment(Point p1, Point p2, Point p3, Point p4) {
+        notEqual(p1, p2, p3, p4);
         double a1 = p1.slopeTo(p2);
         double a2 = p1.slopeTo(p3);
         double a3 = p1.slopeTo(p4);
@@ -58,15 +57,16 @@ public class BruteCollinearPoints {
         }
     }
 
+    private static void notEqual(Point p1, Point p2, Point p3, Point p4) {
+        if (p1.equals(p2) || p1.equals(p3) || p1.equals(p4) || p2.equals(p3) || p3.equals(p4)) {
+            throw new IllegalArgumentException("Found two equal points");
+        }
+    }
+
     private void validatePoints(Point[] points) {
         notNull(points);
-        Set<Point> uniquePoints = new HashSet<>();
         for (Point point : points) {
             notNull(point);
-            uniquePoints.add(point);
-        }
-        if (points.length != uniquePoints.size()) {
-            throw new IllegalArgumentException("Repeated points found");
         }
     }
 

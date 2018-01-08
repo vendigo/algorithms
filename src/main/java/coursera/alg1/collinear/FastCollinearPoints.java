@@ -3,9 +3,7 @@ package coursera.alg1.collinear;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class FastCollinearPoints {
     private List<LineSegment> lineSegments = new ArrayList<>();
@@ -38,6 +36,7 @@ public class FastCollinearPoints {
             for (int i = 2; i < restPoints.size(); i++) { // 0th element - p itself - skipped
                 Point c = restPoints.get(i);
                 double currentSlope = p.slopeTo(c);
+                notEqual(p, c);
                 if (currentSlope == prevSlope) {
                     equalSlopes++;
                 } else {
@@ -50,7 +49,12 @@ public class FastCollinearPoints {
                 }
                 prevSlope = currentSlope;
             }
+        }
+    }
 
+    private void notEqual(Point p, Point c) {
+        if (p.equals(c)) {
+            throw new IllegalArgumentException("Found two equal points");
         }
     }
 
@@ -68,13 +72,8 @@ public class FastCollinearPoints {
 
     private void validatePoints(Point[] points) {
         notNull(points);
-        Set<Point> uniquePoints = new HashSet<>();
         for (Point point : points) {
             notNull(point);
-            uniquePoints.add(point);
-        }
-        if (points.length != uniquePoints.size()) {
-            throw new IllegalArgumentException("Repeated points found");
         }
     }
 
