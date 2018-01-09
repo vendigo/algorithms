@@ -39,7 +39,7 @@ public class BruteCollinearPoints {
         }
     }
 
-    static LineSegment lineSegment(Point p1, Point p2, Point p3, Point p4) {
+    private static LineSegment lineSegment(Point p1, Point p2, Point p3, Point p4) {
         notEqual(p1, p2, p3, p4);
         double a1 = p1.slopeTo(p2);
         double a2 = p1.slopeTo(p3);

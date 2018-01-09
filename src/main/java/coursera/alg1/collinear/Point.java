@@ -41,7 +41,7 @@ public class Point implements Comparable<Point> {
         int yCompare = Double.compare(y, that.y);
 
         if (yCompare == 0) {
-            return Double.compare(x, that.y);
+            return Double.compare(x, that.x);
         } else {
             return yCompare;
         }
@@ -67,8 +67,5 @@ public class Point implements Comparable<Point> {
         public int compare(Point o1, Point o2) {
             return Double.compare(point.slopeTo(o1), point.slopeTo(o2));
         }
-    }
-
-    public static void main(String[] args) {
     }
 }
