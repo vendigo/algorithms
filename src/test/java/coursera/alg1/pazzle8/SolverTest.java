@@ -1,9 +1,6 @@
 package coursera.alg1.pazzle8;
 
-import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.Collections;
 
 import static coursera.alg1.pazzle8.BoardTest.readBoard;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -17,17 +14,12 @@ public class SolverTest {
         Solver solver = new Solver(board);
         assertThat(solver.isSolvable(), equalTo(true));
         assertThat(solver.moves(), equalTo(0));
-        assertThat(solver.solution(), equalTo(Collections.emptyList()));
     }
 
     @Test
     public void oneMoveToSolve() throws Exception {
         Board board = readBoard(BoardTest.p.file("puzzle3x3-01.txt"));
         Solver solver = new Solver(board);
-        for (Board b : solver.solution()) {
-            System.out.println(b);
-            System.out.println();
-        }
         assertThat(solver.isSolvable(), equalTo(true));
         assertThat(solver.moves(), equalTo(1));
     }
@@ -50,7 +42,6 @@ public class SolverTest {
     }
 
     @Test
-    @Ignore
     public void solve4x4_80() throws Exception {
         Board board = readBoard(BoardTest.p.file("puzzle4x4-80.txt"));
         Solver solver = new Solver(board);

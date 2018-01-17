@@ -2,7 +2,8 @@ package coursera.alg1.pazzle8;
 
 import edu.princeton.cs.algs4.MinPQ;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Solver {
@@ -15,33 +16,40 @@ public class Solver {
         MinPQ<Step> queue = new MinPQ<>();
         Step step = new Step(null, initial, 0);
         queue.insert(step);
-        List<Board> solution = new LinkedList<>();
 
         MinPQ<Step> reversedQueue = new MinPQ<>();
         Step reversedStep = new Step(null, initial.twin(), 0);
         reversedQueue.insert(reversedStep);
 
-        while (!step.current.isGoal() && !reversedStep.current.isGoal()) {
+        while (!step.board.isGoal() && !reversedStep.board.isGoal()) {
             step = queue.delMin();
-            solution.add(step.current);
             processNeighbors(queue, step);
             reversedStep = reversedQueue.delMin();
             processNeighbors(reversedQueue, reversedStep);
         }
 
-        if (!solution.isEmpty()) {
-            solution.remove(0);
+        this.solvable = step.board.isGoal();
+        this.solution = this.solvable ? buildSolution(step) : null;
+    }
+
+    private List<Board> buildSolution(Step step) {
+        List<Board> res = new ArrayList<>();
+
+        Step c = step;
+        while (c != null) { //Building reversed solution
+            res.add(c.board);
+            c = c.prevStep;
         }
 
-        this.solvable = step.current.isGoal();
-        this.solution = this.solvable ? solution : null;
+        Collections.reverse(res);
+        return res;
     }
 
     private void processNeighbors(MinPQ<Step> queue, Step currentStep) {
-        Iterable<Board> neighbors = currentStep.current.neighbors();
+        Iterable<Board> neighbors = currentStep.board.neighbors();
         for (Board neighbor : neighbors) {
-            if (!neighbor.equals(currentStep.prev)) {
-                queue.insert(new Step(currentStep.current, neighbor, currentStep.moves + 1));
+            if (!neighbor.equals(currentStep.prevStep != null ? currentStep.prevStep.board : null)) {
+                queue.insert(new Step(currentStep, neighbor, currentStep.moves + 1));
             }
         }
     }
@@ -51,7 +59,7 @@ public class Solver {
     }
 
     public int moves() {
-        return solvable ? solution.size() : -1;
+        return solvable ? solution.size() - 1 : -1;
     }
 
     public Iterable<Board> solution() {
@@ -65,18 +73,20 @@ public class Solver {
     }
 
     private static class Step implements Comparable<Step> {
-        Board prev;
-        Board current;
+        Step prevStep;
+        Board board;
+        int priority;
         int moves;
 
-        Step(Board prev, Board current, int moves) {
-            this.prev = prev;
-            this.current = current;
+        Step(Step prevStep, Board board, int moves) {
+            this.prevStep = prevStep;
+            this.board = board;
             this.moves = moves;
+            this.priority = board.manhattan() + moves;
         }
 
         public int compareTo(Step o) {
-            return Integer.compare(current.manhattan() + moves, o.current.manhattan() + o.moves);
+            return Integer.compare(priority, o.priority);
         }
     }
 }
