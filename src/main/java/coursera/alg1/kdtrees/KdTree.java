@@ -4,7 +4,8 @@ import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
 
-import java.awt.*;
+import java.awt.Color;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,13 +35,13 @@ public class KdTree {
 
     public void insert(Point2D p) {
         notNull(p);
-        root = put(root, null, p,true, true);
+        root = put(root, null, p, true, true);
     }
 
     private Node put(Node n, Node parent, Point2D point, boolean xNode, boolean isLeft) {
         if (n == null) {
             size++;
-            RectHV rect = buildRect(xNode, isLeft, parent);
+            RectHV rect = buildRect(isLeft, parent);
             return new Node(xNode, point, rect);
         }
         int cmp = n.compareTo(point);
@@ -53,9 +54,10 @@ public class KdTree {
         return n;
     }
 
-    private RectHV buildRect(boolean xNode, boolean isLeft, Node parent) {
-        RectHV rect = parent == null ? new RectHV(0, 0, 1,1):parent.rect;
-        Point2D parentPoint = parent == null ? new Point2D(1, 1):parent.point;
+    private RectHV buildRect(boolean isLeft, Node parent) {
+        RectHV rect = parent == null ? new RectHV(0, 0, 1, 1) : parent.rect;
+        Point2D parentPoint = parent == null ? new Point2D(1, 1) : parent.point;
+        boolean xNode = parent == null || parent.xNode;
 
         if (isLeft) {
             if (xNode) {
@@ -133,10 +135,6 @@ public class KdTree {
 
             StdDraw.line(start, n.point.y(), finish, n.point.y());
         }
-        StdDraw.setPenRadius(0.005);
-        StdDraw.setPenColor(Color.YELLOW);
-        n.rect.draw();
-
         draw(n.leftChild, n, true);
         draw(n.rightChild, n, false);
     }
@@ -144,27 +142,60 @@ public class KdTree {
     public Iterable<Point2D> range(RectHV rect) {
         notNull(rect);
 
+        if (root == null) {
+            return Collections.emptyList();
+        }
+
         List<Point2D> inRange = new LinkedList<>();
         if (rect.contains(root.point)) {
             inRange.add(root.point);
         }
 
+        range(inRange, root.leftChild, rect);
+        range(inRange, root.rightChild, rect);
 
         return inRange;
     }
 
-    private RectHV nodeRect(boolean isLeft, Node node, Node root) {
-        return null;
-    }
+    private void range(List<Point2D> inRange, Node node, RectHV rect) {
+        if (node == null || !node.rect.intersects(rect)) {
+            return;
+        }
 
-    private void range(List<Point2D> inRange, Node node, Node parent, RectHV rect) {
+        if (rect.contains(node.point)) {
+            inRange.add(node.point);
+        }
 
+        range(inRange, node.leftChild, rect);
+        range(inRange, node.rightChild, rect);
     }
 
     public Point2D nearest(Point2D p) {
         notNull(p);
+        return nearest(p, root, null);
+    }
 
-        return null;
+    private Point2D nearest(Point2D p, Node node, Point2D nearest) {
+        double nearestDistance = (nearest == null) ? Double.MAX_VALUE : nearest.distanceSquaredTo(p);
+        if (node == null || nearestDistance < node.rect.distanceSquaredTo(p)) {
+            return nearest;
+        }
+
+        if (node.point.distanceSquaredTo(p) < nearestDistance) {
+            nearest = node.point;
+        }
+
+        int cmp = root.point.compareTo(p);
+
+        if (cmp == 0) {
+            return nearest;
+        } else if (cmp < 0) {
+            nearest = nearest(p, node.leftChild, nearest);
+            return nearest(p, node.rightChild, nearest);
+        } else {
+            nearest = nearest(p, node.rightChild, nearest);
+            return nearest(p, node.leftChild, nearest);
+        }
     }
 
     private void notNull(Object obj) {
