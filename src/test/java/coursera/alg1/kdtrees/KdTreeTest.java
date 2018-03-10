@@ -17,27 +17,41 @@ public class KdTreeTest {
     public void find() {
         KdTree kdTree = new KdTree();
         kdTree.insert(new Point2D(0, 0));
-        kdTree.insert(new Point2D(1, 3));
-        kdTree.insert(new Point2D(2, 2));
-        kdTree.insert(new Point2D(4, -5));
-        assertThat(kdTree.contains(new Point2D(1, 3)), equalTo(true));
+        kdTree.insert(new Point2D(0.1, 0.3));
+        kdTree.insert(new Point2D(0.2, 0.2));
+        kdTree.insert(new Point2D(0.4, 0.5));
+        assertThat(kdTree.contains(new Point2D(0.1, 0.3)), equalTo(true));
         assertThat(kdTree.contains(new Point2D(0, 0)), equalTo(true));
-        assertThat(kdTree.contains(new Point2D(4, -5)), equalTo(true));
-        assertThat(kdTree.contains(new Point2D(2, 3)), equalTo(false));
-        assertThat(kdTree.contains(new Point2D(4, -4)), equalTo(false));
-        assertThat(kdTree.contains(new Point2D(3, -1)), equalTo(false));
+        assertThat(kdTree.contains(new Point2D(0.4, 0.5)), equalTo(true));
+        assertThat(kdTree.contains(new Point2D(0.2, 0.3)), equalTo(false));
+        assertThat(kdTree.contains(new Point2D(0.4, 0.4)), equalTo(false));
+        assertThat(kdTree.contains(new Point2D(0.3, 0.1)), equalTo(false));
+    }
+
+    @Test
+    public void find2() {
+        KdTree kdTree = new KdTree();
+        Point2D p1 = new Point2D(0.5, 0.6);
+        Point2D p2 = new Point2D(0.3, 0.3);
+        Point2D p3 = new Point2D(0.7, 0.2);
+        Point2D p4 = new Point2D(0.8, 0.1);
+        kdTree.insert(p1);
+        kdTree.insert(p2);
+        kdTree.insert(p3);
+        kdTree.insert(p4);
+        assertThat(kdTree.contains(p2), equalTo(true));
     }
 
     @Test
     public void range() {
         KdTree kdTree = new KdTree();
         kdTree.insert(new Point2D(0, 0));
-        kdTree.insert(new Point2D(1, 3));
-        kdTree.insert(new Point2D(2, 2));
-        kdTree.insert(new Point2D(4, -5));
+        kdTree.insert(new Point2D(0.1, 0.3));
+        kdTree.insert(new Point2D(0.2, 0.2));
+        kdTree.insert(new Point2D(0.4, 0.5));
 
-        RectHV rect = new RectHV(0, 1, 3, 4);
-        assertThat(kdTree.range(rect), hasItems(new Point2D(1, 3), new Point2D(2, 2)));
+        RectHV rect = new RectHV(0, 0.1, 0.3, 0.4);
+        assertThat(kdTree.range(rect), hasItems(new Point2D(0.1, 0.3), new Point2D(0.2, 0.2)));
         assertThat((Collection<Point2D>) kdTree.range(rect), hasSize(2));
     }
 }

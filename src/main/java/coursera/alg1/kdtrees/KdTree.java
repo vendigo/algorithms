@@ -4,7 +4,7 @@ import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,21 +34,42 @@ public class KdTree {
 
     public void insert(Point2D p) {
         notNull(p);
-        root = put(root, p, true);
+        root = put(root, null, p,true, true);
     }
 
-    private Node put(Node n, Point2D point, boolean xNode) {
+    private Node put(Node n, Node parent, Point2D point, boolean xNode, boolean isLeft) {
         if (n == null) {
             size++;
-            return new Node(xNode, point);
+            RectHV rect = buildRect(xNode, isLeft, parent);
+            return new Node(xNode, point, rect);
         }
         int cmp = n.compareTo(point);
         if (cmp < 0) {
-            n.leftChild = put(n.leftChild, point, !xNode);
+            n.leftChild = put(n.leftChild, n, point, !xNode, true);
         } else if (cmp > 0) {
-            n.rightChild = put(n.rightChild, point, !xNode);
+
+            n.rightChild = put(n.rightChild, n, point, !xNode, false);
         }
         return n;
+    }
+
+    private RectHV buildRect(boolean xNode, boolean isLeft, Node parent) {
+        RectHV rect = parent == null ? new RectHV(0, 0, 1,1):parent.rect;
+        Point2D parentPoint = parent == null ? new Point2D(1, 1):parent.point;
+
+        if (isLeft) {
+            if (xNode) {
+                return new RectHV(rect.xmin(), rect.ymin(), parentPoint.x(), rect.ymax());
+            } else {
+                return new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), parentPoint.y());
+            }
+        } else {
+            if (xNode) {
+                return new RectHV(parentPoint.x(), rect.ymin(), rect.xmax(), rect.ymax());
+            } else {
+                return new RectHV(rect.xmin(), parentPoint.y(), rect.xmax(), rect.ymax());
+            }
+        }
     }
 
     public boolean contains(Point2D p) {
@@ -112,6 +133,9 @@ public class KdTree {
 
             StdDraw.line(start, n.point.y(), finish, n.point.y());
         }
+        StdDraw.setPenRadius(0.005);
+        StdDraw.setPenColor(Color.YELLOW);
+        n.rect.draw();
 
         draw(n.leftChild, n, true);
         draw(n.rightChild, n, false);
@@ -157,9 +181,10 @@ public class KdTree {
         Node rightChild;
         RectHV rect;
 
-        public Node(boolean xNode, Point2D point) {
+        public Node(boolean xNode, Point2D point, RectHV rect) {
             this.xNode = xNode;
             this.point = point;
+            this.rect = rect;
         }
 
         public int compareTo(Point2D o) {
