@@ -12,7 +12,10 @@ public class BoggleSolver {
     public BoggleSolver(String[] dictionary) {
         words = new TrieST<>();
         for (String word : dictionary) {
-            words.put(word, computeScore(word));
+            int score = computeScore(word);
+            if (score > 0) {
+                words.put(word, score);
+            }
         }
     }
 
@@ -21,9 +24,8 @@ public class BoggleSolver {
 
         for (int startY = 0; startY < board.rows(); startY++) {
             for (int startX = 0; startX < board.cols(); startX++) {
-                String startPrefix = board.getLetter(startY, startX) + "";
                 boolean[][] visited = new boolean[board.rows()][board.cols()];
-                dfs(foundWords, board, startPrefix, startX, startY, visited);
+                dfs(foundWords, board, getLetter(board, startY, startX), startX, startY, visited);
             }
         }
 
@@ -42,40 +44,40 @@ public class BoggleSolver {
             foundWords.add(currentPrefix);
         }
 
-        //Process neighbours
-        if (canVisit(board.rows(), board.cols(), x - 1, y - 1, visited)) {
-            dfs(foundWords, board, currentPrefix + board.getLetter(x - 1, y - 1), x - 1, y - 1, visited);
-        }
-        if (canVisit(board.rows(), board.cols(), x, y - 1, visited)) {
-            dfs(foundWords, board, currentPrefix + board.getLetter(x, y - 1), x, y - 1, visited);
-        }
-        if (canVisit(board.rows(), board.cols(), x + 1, y - 1, visited)) {
-            dfs(foundWords, board, currentPrefix + board.getLetter(x + 1, y - 1), x + 1, y - 1, visited);
-        }
-        if (canVisit(board.rows(), board.cols(), x + 1, y, visited)) {
-            dfs(foundWords, board, currentPrefix + board.getLetter(x + 1, y), x + 1, y, visited);
-        }
-        if (canVisit(board.rows(), board.cols(), x + 1, y + 1, visited)) {
-            dfs(foundWords, board, currentPrefix + board.getLetter(x + 1, y + 1), x + 1, y + 1, visited);
-        }
-        if (canVisit(board.rows(), board.cols(), x, y + 1, visited)) {
-            dfs(foundWords, board, currentPrefix + board.getLetter(x, y + 1), x, y + 1, visited);
-        }
-        if (canVisit(board.rows(), board.cols(), x - 1, y + 1, visited)) {
-            dfs(foundWords, board, currentPrefix + board.getLetter(x - 1, y + 1), x - 1, y + 1, visited);
-        }
-        if (canVisit(board.rows(), board.cols(), x - 1, y, visited)) {
-            dfs(foundWords, board, currentPrefix + board.getLetter(x - 1, y), x - 1, y, visited);
-        }
+        visitIfNeed(foundWords, currentPrefix, board, x - 1, y - 1, visited);
+        visitIfNeed(foundWords, currentPrefix, board, x, y - 1, visited);
+        visitIfNeed(foundWords, currentPrefix, board, x + 1, y - 1, visited);
+        visitIfNeed(foundWords, currentPrefix, board, x + 1, y, visited);
+        visitIfNeed(foundWords, currentPrefix, board, x + 1, y + 1, visited);
+        visitIfNeed(foundWords, currentPrefix, board, x, y + 1, visited);
+        visitIfNeed(foundWords, currentPrefix, board, x - 1, y + 1, visited);
+        visitIfNeed(foundWords, currentPrefix, board, x - 1, y, visited);
+
+        visited[y][x] = false;
     }
 
+    private void visitIfNeed(Set<String> foundWords, String currentPrefix, BoggleBoard board, int nextX, int nextY,
+                             boolean[][] visited) {
+        if (onBoard(board.rows(), board.cols(), nextX, nextY)) {
+            String nextPrefix = currentPrefix + getLetter(board, nextY, nextX);
+            if (hasPrefix(nextPrefix) && !visited[nextY][nextX]) {
+                dfs(foundWords, board, nextPrefix, nextX, nextY, visited);
+            }
+        }
+    }
 
     private boolean hasPrefix(String prefix) {
         return words.keysWithPrefix(prefix).iterator().hasNext();
     }
 
-    private boolean canVisit(int rows, int cols, int x, int y, boolean[][] visited) {
-        return x >= 0 && x < cols && y >= 0 && y < rows && !visited[y][x];
+    private String getLetter(BoggleBoard boggleBoard, int row, int col) {
+        char letter = boggleBoard.getLetter(row, col);
+        String suffix = letter == 'Q' ? "U" : "";
+        return letter + suffix;
+    }
+
+    private boolean onBoard(int rows, int cols, int x, int y) {
+        return x >= 0 && x < cols && y >= 0 && y < rows;
     }
 
     public int scoreOf(String word) {
