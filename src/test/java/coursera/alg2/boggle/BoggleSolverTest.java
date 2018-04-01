@@ -45,6 +45,11 @@ public class BoggleSolverTest {
     }
 
     @Test
+    public void test16q() throws Exception {
+        solve("dictionary-16q.txt", "board-16q.txt");
+    }
+
+    @Test
     public void aqua() throws Exception {
         testSolver("dictionary-common.txt", "board-aqua.txt",
                 "QUA");
@@ -53,7 +58,7 @@ public class BoggleSolverTest {
     @Test
     public void yawlDictionaryRandomBoards() {
         BoggleSolver solver = new BoggleSolver(readDictionary("dictionary-yawl.txt"));
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 50; i++) {
             solver.getAllValidWords(new BoggleBoard());
         }
     }

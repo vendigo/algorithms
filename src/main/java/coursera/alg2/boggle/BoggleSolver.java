@@ -1,16 +1,16 @@
 package coursera.alg2.boggle;
 
-import edu.princeton.cs.algs4.TrieST;
+import edu.princeton.cs.algs4.TST;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class BoggleSolver {
 
-    private final TrieST<Integer> words;
+    private final TST<Integer> words;
 
     public BoggleSolver(String[] dictionary) {
-        words = new TrieST<>();
+        words = new TST<>();
         for (String word : dictionary) {
             int score = computeScore(word);
             if (score > 0) {
@@ -25,7 +25,10 @@ public class BoggleSolver {
         for (int startY = 0; startY < board.rows(); startY++) {
             for (int startX = 0; startX < board.cols(); startX++) {
                 boolean[][] visited = new boolean[board.rows()][board.cols()];
-                dfs(foundWords, board, getLetter(board, startY, startX), startX, startY, visited);
+                String startPrefix = getLetter(board, startY, startX);
+                if (hasPrefix(startPrefix)) {
+                    dfs(foundWords, board, startPrefix, startX, startY, visited);
+                }
             }
         }
 
@@ -34,13 +37,9 @@ public class BoggleSolver {
 
     private void dfs(Set<String> foundWords, BoggleBoard board, String currentPrefix, int x, int y,
                      boolean[][] visited) {
-        if (!hasPrefix(currentPrefix)) {
-            return;
-        }
-
         visited[y][x] = true;
         Integer score = words.get(currentPrefix);
-        if (score != null && score > 0) {
+        if (score != null && score > 0 && !foundWords.contains(currentPrefix)) {
             foundWords.add(currentPrefix);
         }
 
