@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jetbrains.annotations.NotNull;
-
 public class CircularSuffixArray {
 
     private final String s;
@@ -66,7 +64,7 @@ public class CircularSuffixArray {
         }
 
         @Override
-        public int compareTo(@NotNull final RefString o) {
+        public int compareTo(final RefString o) {
             int iT = shift;
             int iO = o.shift;
 
