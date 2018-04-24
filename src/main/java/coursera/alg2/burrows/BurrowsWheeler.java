@@ -1,11 +1,7 @@
 package coursera.alg2.burrows;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
@@ -13,6 +9,7 @@ import edu.princeton.cs.algs4.BinaryStdOut;
 public class BurrowsWheeler {
 
     private static final int R = 8;
+    private static final int NUM_CHAR_VALUES = 1 << 8;
 
     public static void transform() {
         String s = BinaryStdIn.readString();
@@ -43,50 +40,43 @@ public class BurrowsWheeler {
 
     public static void inverseTransform() {
         int first = BinaryStdIn.readInt();
-        List<Character> lastColumn = new ArrayList<>();
+        List<Integer>[] occurences = new List[NUM_CHAR_VALUES];
+        int i = 0;
+
+        //Read data and construct occurences
         while (!BinaryStdIn.isEmpty()) {
             char c = BinaryStdIn.readChar(R);
-            lastColumn.add(c);
+            List<Integer> forChar = occurences[c];
+            if (forChar == null) {
+                occurences[c] = new LinkedList<>();
+            }
+            occurences[c].add(i++);
         }
-        List<Character> firstColumn = new ArrayList<>(lastColumn);
-        Collections.sort(firstColumn);
-        int[] next = constructNext(firstColumn, lastColumn);
+        int size = i;
+
+        //Construct next and firstRow
+        int[] next = new int[size];
+        char[] firstRow = new char[size];
+        int j = 0;
+        for (char c = 0x00; c <= 0xFF; c++) {
+            List<Integer> forChar = occurences[c];
+            if (forChar != null) {
+                for (int charPos : forChar) {
+                    next[j] = charPos;
+                    firstRow[j++] = c;
+                }
+            }
+        }
+
+        //Construct original string using next and firstRow
         int current = first;
-        for (int i = 0; i < firstColumn.size(); i++) {
-            char ch = firstColumn.get(current);
+        for (int k = 0; k < size; k++) {
+            char ch = firstRow[current];
             BinaryStdOut.write(ch, R);
             current = next[current];
         }
+
         BinaryStdOut.close();
-    }
-
-    private static int[] constructNext(final List<Character> firstColumn, final List<Character> lastColumn) {
-        Map<Character, List<Integer>> lastOccurences = occurences(lastColumn);
-        Map<Character, Integer> occurences = new HashMap<>();
-        int[] next = new int[lastColumn.size()];
-
-        for (int i = 0; i < firstColumn.size(); i++) {
-            char ch = firstColumn.get(i);
-            int occurence = occurences.getOrDefault(ch, 1);
-            int nextValue = lastOccurences.get(ch).get(occurence - 1);
-            next[i] = nextValue;
-            occurences.put(ch, occurence + 1);
-        }
-
-        return next;
-    }
-
-    private static Map<Character, List<Integer>> occurences(List<Character> column) {
-        Map<Character, List<Integer>> occurences = new HashMap<>();
-
-        for (int i = 0; i < column.size(); i++) {
-            char ch = column.get(i);
-            List<Integer> forChar = occurences.getOrDefault(ch, new LinkedList<>());
-            forChar.add(i);
-            occurences.put(ch, forChar);
-        }
-
-        return occurences;
     }
 
     public static void main(String[] args) {

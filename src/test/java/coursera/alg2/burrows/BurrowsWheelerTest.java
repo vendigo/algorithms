@@ -37,7 +37,7 @@ public class BurrowsWheelerTest {
 
     @Test
     public void inverseTransformAesop() {
-        testTransform("aesop.txt", "aesop.txt.bwt");
+        testInverseTransform("aesop.txt", "aesop.txt.bwt");
     }
 
     @Test
