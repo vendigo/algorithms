@@ -17,11 +17,14 @@ public class BurrowsWheeler {
     public static void transform() {
         String s = BinaryStdIn.readString();
         CircularSuffixArray suffixes = new CircularSuffixArray(s);
-        int first = suffixes.index(0);
+        int first = 0;
         char[] t = new char[s.length()];
         for (int i = 0; i < s.length(); i++) {
-            int index = suffixes.index(i);
-            t[index] = lastForShift(s, i);
+            int shift = suffixes.index(i);
+            t[i] = lastForShift(s, shift);
+            if (shift == 0) {
+                first = i;
+            }
         }
         BinaryStdOut.write(first);
         for (char c : t) {
@@ -65,7 +68,7 @@ public class BurrowsWheeler {
         for (int i = 0; i < firstColumn.size(); i++) {
             char ch = firstColumn.get(i);
             int occurence = occurences.getOrDefault(ch, 1);
-            int nextValue = lastOccurences.get(ch).get(occurence);
+            int nextValue = lastOccurences.get(ch).get(occurence - 1);
             next[i] = nextValue;
             occurences.put(ch, occurence + 1);
         }
