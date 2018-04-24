@@ -50,7 +50,7 @@ public class BurrowsWheeler {
         int[] next = constructNext(firstColumn, lastColumn);
         int current = first;
         for (int i = 0; i < firstColumn.size(); i++) {
-            Character ch = firstColumn.get(current);
+            char ch = firstColumn.get(current);
             BinaryStdOut.write(ch, R);
             current = next[current];
         }
@@ -63,9 +63,9 @@ public class BurrowsWheeler {
         int[] next = new int[lastColumn.size()];
 
         for (int i = 0; i < firstColumn.size(); i++) {
-            Character ch = firstColumn.get(i);
-            Integer occurence = occurences.getOrDefault(ch, 1);
-            Integer nextValue = lastOccurences.get(ch).get(occurence);
+            char ch = firstColumn.get(i);
+            int occurence = occurences.getOrDefault(ch, 1);
+            int nextValue = lastOccurences.get(ch).get(occurence);
             next[i] = nextValue;
             occurences.put(ch, occurence + 1);
         }
@@ -77,7 +77,7 @@ public class BurrowsWheeler {
         Map<Character, List<Integer>> occurences = new HashMap<>();
 
         for (int i = 0; i < column.size(); i++) {
-            Character ch = column.get(i);
+            char ch = column.get(i);
             List<Integer> forChar = occurences.getOrDefault(ch, new LinkedList<>());
             forChar.add(i);
             occurences.put(ch, forChar);
@@ -86,7 +86,11 @@ public class BurrowsWheeler {
         return occurences;
     }
 
-    public static void main(String args[]) {
-
+    public static void main(String[] args) {
+        if (args[0].equals("-")) {
+            transform();
+        } else {
+            inverseTransform();
+        }
     }
 }

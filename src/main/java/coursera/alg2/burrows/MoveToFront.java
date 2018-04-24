@@ -39,7 +39,7 @@ public class MoveToFront {
 
         while (!BinaryStdIn.isEmpty()) {
             int i = BinaryStdIn.readInt(R);
-            Character ch = chars.remove(i);
+            char ch = chars.remove(i);
             BinaryStdOut.write(ch, R);
             chars.add(ZERO, ch);
         }

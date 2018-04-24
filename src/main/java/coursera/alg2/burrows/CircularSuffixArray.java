@@ -24,7 +24,7 @@ public class CircularSuffixArray {
         Collections.sort(suffixes);
         Map<Integer, Integer> indices = new HashMap<>();
         for (int i = 0; i < suffixes.size(); i++) {
-            indices.put(suffixes.get(i).shift, i);
+            indices.put(i, suffixes.get(i).shift);
         }
         return indices;
     }
@@ -36,10 +36,6 @@ public class CircularSuffixArray {
     public int index(int i) {
         inRange(i);
         return indices.get(i);
-    }
-
-    public static void main(String[] args) {
-
     }
 
     private String notNull(final String s) {
