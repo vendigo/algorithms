@@ -1,32 +1,25 @@
 package coursera.alg2.burrows;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class CircularSuffixArray {
 
     private final String s;
-    private final Map<Integer, Integer> indices;
+    private final Integer[] indices;
 
     public CircularSuffixArray(String s) {
         this.s = notNull(s);
         this.indices = countIndices(s);
     }
 
-    private Map<Integer, Integer> countIndices(final String s) {
-        List<RefString> suffixes = new ArrayList<>(s.length());
+    private Integer[] countIndices(final String s) {
+        Integer[] shifts = new Integer[s.length()];
         for (int i = 0; i < s.length(); i++) {
-            suffixes.add(new RefString(i));
+            shifts[i] = i;
         }
-        Collections.sort(suffixes);
-        Map<Integer, Integer> indices = new HashMap<>();
-        for (int i = 0; i < suffixes.size(); i++) {
-            indices.put(i, suffixes.get(i).shift);
-        }
-        return indices;
+        Arrays.sort(shifts, new RefComparator());
+        return shifts;
     }
 
     public int length() {
@@ -35,7 +28,7 @@ public class CircularSuffixArray {
 
     public int index(int i) {
         inRange(i);
-        return indices.get(i);
+        return indices[i];
     }
 
     private String notNull(final String s) {
@@ -51,18 +44,12 @@ public class CircularSuffixArray {
         }
     }
 
-    private class RefString implements Comparable<RefString> {
-
-        private final int shift;
-
-        RefString(final int shift) {
-            this.shift = shift;
-        }
+    private class RefComparator implements Comparator<Integer> {
 
         @Override
-        public int compareTo(final RefString o) {
-            int iT = shift;
-            int iO = o.shift;
+        public int compare(final Integer tShift, final Integer oShift) {
+            int iT = tShift;
+            int iO = oShift;
 
             for (int i = 0; i < s.length(); i++) {
                 if (s.charAt(iT) > s.charAt(iO)) {
